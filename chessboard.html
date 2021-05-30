@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chess Board with JS</title>
+   <link rel="stylesheet" href="css/chessboard.css">
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/chessboard.js"></script>
+
+
+
+<script>
+var moves = ['e2-e4','e7-e5','g1-f3','b8-c6','d2-d4','g8-f6','b2-b3','b7-b5']; 
+var currentMove = 0;
+var slideShowPlaying = false;
+var slideShowInterval;
+var mySlideShow = 0;
+
+var init = function() {
+
+//--- start example JS ---
+currentMove = 0;
+var board = ChessBoard('board', 'start');
+ 
+//--- end example JS ---
+$('#next_move').on('click', function() {
+     next_move();
+
+});
+
+function next_move()
+{
+
+ if (currentMove < moves.length)
+    {
+     	slideShowInterval = document.getElementById("timeBetweenMoves").value;
+		board.move(moves[currentMove]);
+		currentMove++;
+    }
+  
+    
+}
+
+$('#restart').on('click', function() {
+  
+  board.start();
+  currentMove = 0;  
+  
+});
+
+$('#slide_show').on('click', function() 
+{
+  
+ 
+  var showButtonValue = document.getElementById("slide_show").value;
+  //alert(slideShowInterval);
+  slideShowInterval =  document.getElementById("timeBetweenMoves").value;
+  //alert(showButtonValue);
+  if (showButtonValue == "Start Show")
+  {
+     $('#slide_show').attr('value',"Pause Show");
+	 mySlideShow = setInterval(next_move,slideShowInterval);
+	 
+  } else {
+     
+	 window.clearInterval(mySlideShow);
+ 	 $('#slide_show').attr('value',"Start Show");
+  }  
+  
+});
+
+
+function reverse_A_Move(theMove)
+{
+    
+  var moveParts = theMove.split('-');
+    var flippedMove = moveParts[1] + '-' + moveParts[0];
+	return flippedMove;
+
+}
+
+
+
+$('#previous_move').on('click', function() {
+  
+     
+  if (currentMove > 0)
+    {
+	    currentMove--;
+        var backMove = reverse_A_Move(moves[currentMove]);
+		board.move(backMove);
+    }
+});
+
+
+
+
+
+
+
+}; // end init()
+
+$(document).ready(init);
+
+function upDateLabelandShow()
+{
+    var slider = document.getElementById("timeBetweenMoves");
+	var label  = document.getElementById("sliderLabel");
+	
+	slideShowInterval = slider.value;
+	window.clearInterval(mySlideShow);
+ 	mySlideShow = window.setInterval(next_move,slideShowInterval);
+	label.innerHTML = String(slider.value);
+}
+</script>
+</head>
+<body>
+<div id="board" style="width: 400px"></div>
+<p>
+
+<input type="button" id="restart"     value="|<"/>
+<input type="button" id="previous_move" value="<<"/>
+<input type="button" id="next_move"   value=">>"/>
+<input type="button" id="slide_show"  value="Start Show"/>
+<p/>
+
+<input type="range"  id="timeBetweenMoves" onChange="upDateLabelandShow()" value="500" min="250" max="6000"/><span id="sliderLabel">500</span>
+
+</body>
